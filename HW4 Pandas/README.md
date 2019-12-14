@@ -1,197 +1,328 @@
-# Pandas Homework - Pandas, Pandas, Pandas
+Heroes Of Pymoli Data Analysis
+Background
 
-## Background
+Observable Trends
+Of the 1163 active players, the vast majority are male (84%). There also exists, a smaller, but notable proportion of female players (14%).
 
-The data dive continues!
+Our peak age demographic falls between 20-24 (44.79%) with secondary groups falling between 15-19 (18.58%) and 25-29 (13.37%).
 
-Now, it's time to take what you've learned about Python Pandas and apply it to new situations. For this assignment, you'll need to complete **one of two** (not both)  Data Challenges. Once again, which challenge you take on is your choice. Just be sure to give it your all -- as the skills you hone will become powerful tools in your data analytics tool belt.
+The age group that spends the most money is the 20-24 with $1,114.06 dollars as total purchase value and an average purchase of $4.32. In contrast, the demographic group that has the highest average purchase is the 35-39 with $4.76 and a total purchase value of $147.67.
 
-### Before You Begin
+# Dependencies and Setup
+import pandas as pd
+import numpy as np
 
-1. Create a new repository for this project called `pandas-challenge`. **Do not add this homework to an existing repository**.
+# Raw data file
+file_to_load = "Resources/purchase_data.csv"
 
-2. Clone the new repository to your computer.
+# Read purchasing file and store into pandas data frame
+purchase_data = pd.read_csv(file_to_load)
+Player Count
+Total Number of Players
+# Use the length of list of screen names "SN", for total players.
+total_players = len(purchase_data["SN"].value_counts())
 
-3. Inside your local git repository, create a directory for the Pandas Challenge you choose. Use folder names corresponding to the challenges: **HeroesOfPymoli** or  **PyCitySchools**.
+# Create a data frame with total players named player count
+player_count = pd.DataFrame({"Total Players":[total_players]})
+player_count
+Total Players
+0	576
+Purchasing Analysis (Total)
+Number of Unique Items
 
-4. Add your Jupyter notebook to this folder. This will be the main script to run for analysis.
+Average Purchase Price
 
-5. Push the above changes to GitHub or GitLab.
+Total Number of Purchases
 
-## Option 1: Heroes of Pymoli
+Total Revenue
 
-![Fantasy](Images/Fantasy.png)
+# Calculations for unique items, average price, purchase count, and revenue
+number_of_unique_items = len((purchase_data["Item ID"]).unique())
+average_price = (purchase_data["Price"]).mean()
+number_of_purchases = (purchase_data["Purchase ID"]).count()
+total_revenue = (purchase_data["Price"]).sum()
 
-Congratulations! After a lot of hard work in the data munging mines, you've landed a job as Lead Analyst for an independent gaming company. You've been assigned the task of analyzing the data for their most recent fantasy game Heroes of Pymoli.
+# Create data frame with obtained values
+summary_df = pd.DataFrame({"Number of Unique Items":[number_of_unique_items],
+                           "Average Price":[average_price], 
+                           "Number of Purchases": [number_of_purchases], 
+                           "Total Revenue": [total_revenue]})
 
-Like many others in its genre, the game is free-to-play, but players are encouraged to purchase optional items that enhance their playing experience. As a first task, the company would like you to generate a report that breaks down the game's purchasing data into meaningful insights.
+# Format with currency style
+summary_df.style.format({'Average Price':"${:,.2f}",
+                         'Total Revenue': '${:,.2f}'})
+Number of Unique Items	Average Price	Number of Purchases	Total Revenue
+0	183	$3.05	780	$2,379.77
+Gender Demographics
+Percentage and Count of Male Players
 
-Your final report should include each of the following:
+Percentage and Count of Female Players
 
-### Player Count
+Percentage and Count of Other / Non-Disclosed
 
-* Total Number of Players
+# Group purchase_data by Gender
+gender_stats = purchase_data.groupby("Gender")
 
-### Purchasing Analysis (Total)
+# Count the total of screen names "SN" by gender
+total_count_gender = gender_stats.nunique()["SN"]
 
-* Number of Unique Items
-* Average Purchase Price
-* Total Number of Purchases
-* Total Revenue
+# Total count by gender and divivde by total players 
+percentage_of_players = total_count_gender / total_players * 100
 
-### Gender Demographics
+# Create data frame with obtained values
+gender_demographics = pd.DataFrame({"Percentage of Players": percentage_of_players, "Total Count": total_count_gender})
 
-* Percentage and Count of Male Players
-* Percentage and Count of Female Players
-* Percentage and Count of Other / Non-Disclosed
+# Format the data frame with no index name in the corner
+gender_demographics.index.name = None
 
-### Purchasing Analysis (Gender)
+# Format the values sorted by total count in descending order, and two decimal places for the percentage
+gender_demographics.sort_values(["Total Count"], ascending = False).style.format({"Percentage of Players":"{:.2f}"})
 
-* The below each broken by gender
-  * Purchase Count
-  * Average Purchase Price
-  * Total Purchase Value
-  * Average Purchase Total per Person by Gender
 
-### Age Demographics
+Percentage of Players	Total Count
+Male	84.03	484
+Female	14.06	81
+Other / Non-Disclosed	1.91	11
+Purchasing Analysis (Gender)
+The below each broken by gender
 
-* The below each broken into bins of 4 years (i.e. &lt;10, 10-14, 15-19, etc.)
-  * Purchase Count
-  * Average Purchase Price
-  * Total Purchase Value
-  * Average Purchase Total per Person by Age Group
+Purchase Count
 
-### Top Spenders
+Average Purchase Price
 
-* Identify the the top 5 spenders in the game by total purchase value, then list (in a table):
-  * SN
-  * Purchase Count
-  * Average Purchase Price
-  * Total Purchase Value
+Total Purchase Value
 
-### Most Popular Items
+Average Purchase Total per Person by Gender
 
-* Identify the 5 most popular items by purchase count, then list (in a table):
-  * Item ID
-  * Item Name
-  * Purchase Count
-  * Item Price
-  * Total Purchase Value
+# Count the total purchases by gender 
+purchase_count = gender_stats["Purchase ID"].count()
 
-### Most Profitable Items
+# Average purchase prices by gender
+avg_purchase_price = gender_stats["Price"].mean()
 
-* Identify the 5 most profitable items by total purchase value, then list (in a table):
-  * Item ID
-  * Item Name
-  * Purchase Count
-  * Item Price
-  * Total Purchase Value
+# Average purchase total by gender 
+avg_purchase_total = gender_stats["Price"].sum()
 
-As final considerations:
+# Average purchase total by gender divivded by purchase count by unique shoppers
+avg_purchase_per_person = avg_purchase_total/total_count_gender
 
-* You must use the Pandas Library and the Jupyter Notebook.
-* You must submit a link to your Jupyter Notebook with the viewable Data Frames.
-* You must include a written description of three observable trends based on the data.
-* See [Example Solution](HeroesOfPymoli/HeroesOfPymoli_starter.ipynb) for a reference on expected format.
+# Create data frame with obtained values 
+gender_demographics = pd.DataFrame({"Purchase Count": purchase_count, 
+                                    "Average Purchase Price": avg_purchase_price,
+                                    "Average Purchase Value":avg_purchase_total,
+                                    "Avg Purchase Total per Person": avg_purchase_per_person})
+
+# Provide index in top left as "Gender"
+gender_demographics.index.name = "Gender"
+
+# Format with currency style
+gender_demographics.style.format({"Average Purchase Value":"${:,.2f}",
+                                  "Average Purchase Price":"${:,.2f}",
+                                  "Avg Purchase Total per Person":"${:,.2f}"})
 
-## Option 2: Academy of Py
+Purchase Count	Average Purchase Price	Average Purchase Value	Avg Purchase Total per Person
+Gender				
+Female	113	$3.20	$361.94	$4.47
+Male	652	$3.02	$1,967.64	$4.07
+Other / Non-Disclosed	15	$3.35	$50.19	$4.56
+Age Demographics
+The below each broken into bins of 4 years (i.e. <10, 10-14, 15-19, etc.)
 
-![Education](Images/education.png)
+Percentage of Players
 
-Well done! Having spent years analyzing financial records for big banks, you've finally scratched your idealistic itch and joined the education sector. In your latest role, you've become the Chief Data Scientist for your city's school district. In this capacity, you'll be helping the  school board and mayor make strategic decisions regarding future school budgets and priorities.
+Total Count
 
-As a first task, you've been asked to analyze the district-wide standardized test results. You'll be given access to every student's math and reading scores, as well as various information on the schools they attend. Your responsibility is to aggregate the data to and showcase obvious trends in school performance.
+# Establish bins for ages
+age_bins = [0, 9.90, 14.90, 19.90, 24.90, 29.90, 34.90, 39.90, 99999]
+group_names = ["<10", "10-14", "15-19", "20-24", "25-29", "30-34", "35-39", "40+"]
 
-Your final report should include each of the following:
+# Segment and sort age values into bins established above
+purchase_data["Age Group"] = pd.cut(purchase_data["Age"],age_bins, labels=group_names)
+purchase_data
 
-### District Summary
+# Create new data frame with the added "Age Group" and group it
+age_grouped = purchase_data.groupby("Age Group")
 
-* Create a high level snapshot (in table form) of the district's key metrics, including:
-  * Total Schools
-  * Total Students
-  * Total Budget
-  * Average Math Score
-  * Average Reading Score
-  * % Passing Math
-  * % Passing Reading
-  * Overall Passing Rate (Average of the above two)
+# Count total players by age category
+total_count_age = age_grouped["SN"].nunique()
 
-### School Summary
+# Calculate percentages by age category 
+percentage_by_age = (total_count_age/total_players) * 100
 
-* Create an overview table that summarizes key metrics about each school, including:
-  * School Name
-  * School Type
-  * Total Students
-  * Total School Budget
-  * Per Student Budget
-  * Average Math Score
-  * Average Reading Score
-  * % Passing Math
-  * % Passing Reading
-  * Overall Passing Rate (Average of the above two)
+# Create data frame with obtained values
+age_demographics = pd.DataFrame({"Percentage of Players": percentage_by_age, "Total Count": total_count_age})
 
-### Top Performing Schools (By Passing Rate)
+# Format the data frame with no index name in the corner
+age_demographics.index.name = None
 
-* Create a table that highlights the top 5 performing schools based on Overall Passing Rate. Include:
-  * School Name
-  * School Type
-  * Total Students
-  * Total School Budget
-  * Per Student Budget
-  * Average Math Score
-  * Average Reading Score
-  * % Passing Math
-  * % Passing Reading
-  * Overall Passing Rate (Average of the above two)
+# Format percentage with two decimal places 
+age_demographics.style.format({"Percentage of Players":"{:,.2f}"})
+Percentage of Players	Total Count
+<10	2.95	17
+10-14	3.82	22
+15-19	18.58	107
+20-24	44.79	258
+25-29	13.37	77
+30-34	9.03	52
+35-39	5.38	31
+40+	2.08	12
+Purchasing Analysis (Age)
+The below each broken into bins of 4 years (i.e. <10, 10-14, 15-19, etc.)
 
-### Bottom Performing Schools (By Passing Rate)
+Purchase Count
 
-* Create a table that highlights the bottom 5 performing schools based on Overall Passing Rate. Include all of the same metrics as above.
+Average Purchase Price
 
-### Math Scores by Grade\*\*
+Total Purchase Value
 
-* Create a table that lists the average Math Score for students of each grade level (9th, 10th, 11th, 12th) at each school.
+Average Purchase Total per Person by Age Group
 
-### Reading Scores by Grade
+# Count purchases by age group
+purchase_count_age = age_grouped["Purchase ID"].count()
 
-* Create a table that lists the average Reading Score for students of each grade level (9th, 10th, 11th, 12th) at each school.
+# Obtain average purchase price by age group 
+avg_purchase_price_age = age_grouped["Price"].mean()
 
-### Scores by School Spending
+# Calculate total purchase value by age group 
+total_purchase_value = age_grouped["Price"].sum()
 
-* Create a table that breaks down school performances based on average Spending Ranges (Per Student). Use 4 reasonable bins to group school spending. Include in the table each of the following:
-  * Average Math Score
-  * Average Reading Score
-  * % Passing Math
-  * % Passing Reading
-  * Overall Passing Rate (Average of the above two)
+# Calculate the average purchase per person in the age group 
+avg_purchase_per_person_age = total_purchase_value/total_count_age
 
-### Scores by School Size
+# Create data frame with obtained values
+age_demographics = pd.DataFrame({"Purchase Count": purchase_count_age,
+                                 "Average Purchase Price": avg_purchase_price_age,
+                                 "Total Purchase Value":total_purchase_value,
+                                 "Average Purchase Total per Person": avg_purchase_per_person_age})
 
-* Repeat the above breakdown, but this time group schools based on a reasonable approximation of school size (Small, Medium, Large).
+# Format the data frame with no index name in the corner
+age_demographics.index.name = None
 
-### Scores by School Type
+# Format with currency style
+age_demographics.style.format({"Average Purchase Price":"${:,.2f}",
+                               "Total Purchase Value":"${:,.2f}",
+                               "Average Purchase Total per Person":"${:,.2f}"})
 
-* Repeat the above breakdown, but this time group schools based on school type (Charter vs. District).
+Purchase Count	Average Purchase Price	Total Purchase Value	Average Purchase Total per Person
+<10	23	$3.35	$77.13	$4.54
+10-14	28	$2.96	$82.78	$3.76
+15-19	136	$3.04	$412.89	$3.86
+20-24	365	$3.05	$1,114.06	$4.32
+25-29	101	$2.90	$293.00	$3.81
+30-34	73	$2.93	$214.00	$4.12
+35-39	41	$3.60	$147.67	$4.76
+40+	13	$2.94	$38.24	$3.19
+Top Spenders
+Identify the the top 5 spenders in the game by total purchase value, then list (in a table):
 
-As final considerations:
+SN(screen name)
 
-* Use the pandas library and Jupyter Notebook.
-* You must submit a link to your Jupyter Notebook with the viewable Data Frames.
-* You must include a written description of at least two observable trends based on the data.
-* See [Example Solution](PyCitySchools/PyCitySchools_starter.ipynb) for a reference on the expected format.
+Purchase Count
 
-## Hints and Considerations
+Average Purchase Price
 
-* These are challenging activities for a number of reasons. For one, these activities will require you to analyze thousands of records. Hacking through the data to look for obvious trends in Excel is just not a feasible option. The size of the data may seem daunting, but pandas will allow you to efficiently parse through it.
+Total Purchase Value
 
-* Second, these activities will also challenge you by requiring you to learn on your feet. Don't fool yourself into thinking: "I need to study pandas more closely before diving in." Get the basic gist of the library and then _immediately_ get to work. When facing a daunting task, it's easy to think: "I'm just not ready to tackle it yet." But that's the surest way to never succeed. Learning to program requires one to constantly tinker, experiment, and learn on the fly. You are doing exactly the _right_ thing, if you find yourself constantly practicing Google-Fu and diving into documentation. There is just no way (or reason) to try and memorize it all. Online references are available for you to use when you need them. So use them!
+# Group purchase data by screen names
+spender_stats = purchase_data.groupby("SN")
 
-* Take each of these tasks one at a time. Begin your work, answering the basic questions: "How do I import the data?" "How do I convert the data into a DataFrame?" "How do I build the first table?" Don't get intimidated by the number of asks. Many of them are repetitive in nature with just a few tweaks. Be persistent and creative!
+# Count the total purchases by name
+purchase_count_spender = spender_stats["Purchase ID"].count()
 
-* Expect these exercises to take time! Don't get discouraged if you find yourself spending  hours initially with little progress. Force yourself to deal with the discomfort of not knowing and forge ahead. Consider these hours an investment in your future!
+# Calculate the average purchase by name 
+avg_purchase_price_spender = spender_stats["Price"].mean()
 
-* As always, feel encouraged to work in groups and get help from your TAs and Instructor. Just remember, true success comes from mastery and _not_ a completed homework assignment. So challenge yourself to truly succeed!
+# Calculate purchase total 
+purchase_total_spender = spender_stats["Price"].sum()
 
-### Copyright
+# Create data frame with obtained values
+top_spenders = pd.DataFrame({"Purchase Count": purchase_count_spender,
+                             "Average Purchase Price": avg_purchase_price_spender,
+                             "Total Purchase Value":purchase_total_spender})
 
-Trilogy Education Services © 2019. All Rights Reserved.
+# Sort in descending order to obtain top 5 spender names 
+formatted_spenders = top_spenders.sort_values(["Total Purchase Value"], ascending=False).head()
+
+# Format with currency style
+formatted_spenders.style.format({"Average Purchase Total":"${:,.2f}",
+                                 "Average Purchase Price":"${:,.2f}", 
+                                 "Total Purchase Value":"${:,.2f}"})
+Purchase Count	Average Purchase Price	Total Purchase Value
+SN			
+Lisosia93	5	$3.79	$18.96
+Idastidru52	4	$3.86	$15.45
+Chamjask73	3	$4.61	$13.83
+Iral74	4	$3.40	$13.62
+Iskadarya95	3	$4.37	$13.10
+Most Popular Items
+Top 5 most popular items by purchase count:
+
+Item ID
+
+Item Name
+
+Purchase Count
+
+Item Price
+
+Total Purchase Value
+
+# Create new data frame with items related information 
+items = purchase_data[["Item ID", "Item Name", "Price"]]
+
+# Group the item data by item id and item name 
+item_stats = items.groupby(["Item ID","Item Name"])
+
+# Count the number of times an item has been purchased 
+purchase_count_item = item_stats["Price"].count()
+
+# Calcualte the purchase value per item 
+purchase_value = (item_stats["Price"].sum()) 
+
+# Find individual item price
+item_price = purchase_value/purchase_count_item
+
+# Create data frame with obtained values
+most_popular_items = pd.DataFrame({"Purchase Count": purchase_count_item, 
+                                   "Item Price": item_price,
+                                   "Total Purchase Value":purchase_value})
+
+# Sort in descending order to obtain top spender names and provide top 5 item names
+popular_formatted = most_popular_items.sort_values(["Purchase Count"], ascending=False).head()
+
+# Format with currency style
+popular_formatted.style.format({"Item Price":"${:,.2f}",
+                                "Total Purchase Value":"${:,.2f}"})
+Purchase Count	Item Price	Total Purchase Value
+Item ID	Item Name			
+178	Oathbreaker, Last Hope of the Breaking Storm	12	$4.23	$50.76
+145	Fiery Glass Crusader	9	$4.58	$41.22
+108	Extraction, Quickblade Of Trembling Hands	9	$3.53	$31.77
+82	Nirvana	9	$4.90	$44.10
+19	Pursuit, Cudgel of Necromancy	8	$1.02	$8.16
+Most Profitable Items
+Top 5 most profitable items by total purchase value:
+
+Item ID
+
+Item Name
+
+Purchase Count
+
+Item Price
+
+Total Purchase Value
+
+# Take the most_popular items data frame and change the sorting to find highest total purchase value
+popular_formatted = most_popular_items.sort_values(["Total Purchase Value"],
+                                                   ascending=False).head()
+# Format with currency style
+popular_formatted.style.format({"Item Price":"${:,.2f}",
+                                "Total Purchase Value":"${:,.2f}"})
+Purchase Count	Item Price	Total Purchase Value
+Item ID	Item Name			
+178	Oathbreaker, Last Hope of the Breaking Storm	12	$4.23	$50.76
+82	Nirvana	9	$4.90	$44.10
+145	Fiery Glass Crusader	9	$4.58	$41.22
+92	Final Critic	8	$4.88	$39.04
+103	Singed Scalpel	8	$4.35	$34.80
