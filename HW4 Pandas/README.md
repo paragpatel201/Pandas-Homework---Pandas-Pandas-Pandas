@@ -2,9 +2,13 @@
 
 ## Background
 
-The data dive continues!
+Heroes Of Pymoli Data Analysis Background
 
-Now, it's time to take what you've learned about Python Pandas and apply it to new situations. For this assignment, you'll need to complete **one of two** (not both)  Data Challenges. Once again, which challenge you take on is your choice. Just be sure to give it your all -- as the skills you hone will become powerful tools in your data analytics tool belt.
+Observable Trends Of the 1163 active players, the vast majority are male (84%). There also exists, a smaller, but notable proportion of female players (14%).
+
+Our peak age demographic falls between 20-24 (44.79%) with secondary groups falling between 15-19 (18.58%) and 25-29 (13.37%).
+
+The age group that spends the most money is the 20-24 with $1,114.06 dollars as total purchase value and an average purchase of $4.32. In contrast, the demographic group that has the highest average purchase is the 35-39 with $4.76 and a total purchase value of $147.67.
 
 ### Before You Begin
 
